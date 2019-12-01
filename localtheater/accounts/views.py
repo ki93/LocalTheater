@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login as auth_signin
 from django.contrib.auth import logout as auth_signout
+# 상속 받아 만든 CreateUserForm import
+from .models import CreateUserForm
 # Create your views here.
 
 def signin(request):
@@ -25,7 +27,7 @@ def signout(request):
 
 def signup(request):
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = CreateUserForm(request.POST)
         if form.is_valid():
             user = form.save()
             auth_signin(request, user)
