@@ -43,7 +43,7 @@
         | `id` | NUM | `pk` |
         | `theater_id` | ForeignKey(Theater, on_delete=models.CASCADE) | `fk` |
         | `movie_name` | CharField(max_length=100) |  |
-        | `showtime` | DateTimeField() | 상영 시작 시간 |
+        | `show_time` | DateTimeField() | 상영 시작 시간 |
         | `created_at` | DateTimeField(auto_now_add=True) | ex.일반관,특별관 ... |
         | `updated_at` | DateTimeField(auto_now=True) | ex.일반관,특별관 ... |
         

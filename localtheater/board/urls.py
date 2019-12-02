@@ -5,5 +5,7 @@ app_name = "board"
 
 urlpatterns = [
     path('', views.index, name="index"),
-    path('findmovie', views.findmovie, name="findmovie"),
+    path('findmovie/', views.findmovie, name="findmovie"),
+    path('adminpage/', views.adminpage, name="adminpage"),
 ]
+

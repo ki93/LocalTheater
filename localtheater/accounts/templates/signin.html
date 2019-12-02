@@ -38,21 +38,30 @@
         <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
         <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
         <label for="inputEmail" class="sr-only">Email address</label>
-        <!-- <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus=""> -->
-        <input name="username" type="text" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
+        <!-- <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Email address" required=""
+            autofocus=""> -->
+        <input name="username" type="text" id="inputUsername" class="form-control" placeholder="User Name" required="" autofocus="">
         <label for="inputPassword" class="sr-only">Password</label>
-        <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required="">
+        <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password"
+            required="">
         <div class="checkbox mb-3">
             <label>
                 <input type="checkbox" value="remember-me"> Remember me
             </label>
         </div>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-        <button class="btn btn-lg btn-info btn-block" href="{% url 'accounts:signup' %}">Sign up</button>
+        <a class="btn btn-lg btn-info btn-block btn-signup" href="{% url 'accounts:signup' %}">Sign Up</a>
         <p class="mt-5 mb-3 text-muted">© 2017-2019</p>
     </form>
-
-
 </body>
 
 </html>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script>
+    $(function () {
+        $(document).on('click', '.btn-signup', function () {
+            console.log($(this))
+        })
+    })
+</script>

@@ -28,14 +28,15 @@
             </div>
         </span>
         <a class="p-2 text-dark" href="#">Reviews</a>
+        {% if user.is_staff %}
+        <a class="text-dark p-2" href="{% url 'board:adminpage' %}">Admin Page</a>
+        {% endif %}
         {% if user.is_authenticated %}
+        <span class="text-primary">{{user.email}}</span>
         <a class="text-dark p-2" href="{% url 'accounts:signout' %}">Sign out</a>
         {% else %}
         <a class="text-dark p-2" href="{% url 'accounts:signin' %}">Sign in</a>
         <a class="text-dark p-2" href="{% url 'accounts:signup' %}">Sign up</a>
-        {% endif %}
-        {% if user.is_staff %}
-        <a class="text-dark p-2" href="{% url 'accounts:signout' %}">Admin Page</a>
         {% endif %}
     </nav>
 </div>

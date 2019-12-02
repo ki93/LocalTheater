@@ -41,6 +41,7 @@
         <input name="username" type="text" id="inputUsername" class="form-control" placeholder="User Name" required="" autofocus="">
         <label for="inputEmail" class="sr-only">Email address</label>
         <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
+        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
         <label for="inputPassword" class="sr-only">Password</label>
         <input name="password1" type="password" id="inputPassword" class="form-control" placeholder="Password" required="">
         <input name="password2" type="password" id="inputPassword" class="form-control" placeholder="Confirmation" required="" >
@@ -48,6 +49,7 @@
 
         </div>
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign Up</button>
+        <a class="btn btn-lg btn-info btn-block btn-signup" href="{% url 'accounts:signin' %}">Sign In</a>
         <p class="mt-5 mb-3 text-muted">© 2017-2019</p>
     </form>
 

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+<!-- 실제 표시 내용 -->
+{% block content %}
+<h1 class="ml-5">Admin Page</h1>
+<div class="container mt-3">
+    <div class="row row-cols-2">
+        <form class="theater-form">
+            <div class="form-group col">
+                <h3>Theater</h3>
+                <input type="hidden" name="formname" value="theater">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+                <input type="text" class="form-control" placeholder="company" name="company">
+                <input type="text" class="form-control" placeholder="branch" name="branch">
+                <input type="text" class="form-control" placeholder="num" name="num">
+                <input type="text" class="form-control" placeholder="category" name="category">
+                <input type="number" class="form-control" placeholder="lat" name="lat" step="any">
+                <input type="number" class="form-control" placeholder="lon" name="lon" step="any">
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+            </div>
+        </form>
+        <form class="movie-form">
+            <div class="movie-form-group col">
+                <h3>Movie</h3>
+                <input type="hidden" name="formname" value="movie">
+                <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+                <input type="text" readonly="true" class="form-control" placeholder="theater_id" name="theater_id">
+                <input type="text" class="form-control" placeholder="movie_name" name="movie_name">
+                <input type="text" class="form-control" placeholder="showtime" name="show_time">
+                <button type="submit" class="btn btn-primary float-right">Submit</button>
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        Theater
+    </div>
+    <div class="row">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Company</th>
+                    <th scope="col">Branch</th>
+                    <th scope="col">Num</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Lat</th>
+                    <th scope="col">Long</th>
+                </tr>
+            </thead>
+            <tbody class="theater-tbody">
+                {% for theater in theaters %}
+                <tr class="theater-row" data-theater-id="{{theater.id}}">
+                    <th scope="row">{{theater.id}}</th>
+                    <td>{{theater.company}}</td>
+                    <td>{{theater.branch}}</td>
+                    <td>{{theater.num}}</td>
+                    <td>{{theater.category}}</td>
+                    <td>{{theater.lat}}</td>
+                    <td>{{theater.lon}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+{% endblock %}
+<!-- 자바스크립트 -->
+{% block script %}
+<script>
+    $(function () {
+        $(document).on('click', '.theater-row', function () {
+            console.log($(this).data('theater-id'));
+            var theater_id = $(this).data('theater-id');
+            $('input[name=theater_id]').val(theater_id);
+        })
+        $(document).on('submit', '.movie-form', function (event) {
+            event.preventDefault();
+            console.log($(this).serialize());
+            var data = $(this).serialize();
+            $(this).find('input').val("");
+            $.ajax({
+                url: '{% url "board:adminpage" %}',
+                method: 'POST',
+                data: data,
+                success: function (data) {
+                    console.log("Success");
+                    console.log(data);
+                    console.log(data.movie_name);
+                },
+                error: function (data) {
+                    console.log("Fail");
+                    if (data.status == 403) {
+                        alert(data.responseJSON());
+                        location.href = '{% url "accounts:signin" %}'
+                    }
+                }
+
+            })
+
+        })
+        $(document).on('submit', '.theater-form', function (event) {
+            event.preventDefault();
+            console.log($(this).serialize());
+            var data = $(this).serialize();
+            $(this).find('input').val("");
+            $.ajax({
+                url: '{% url "board:adminpage" %}',
+                method: 'POST',
+                data: data,
+                success: function (data) {
+                    console.log("Success");
+                    console.log(data);
+                    console.log(data.company);
+                    $('.theater-tbody').append(`<tr class="theater-row" data-theater-id="{{theater.id}}">
+                    <th scope="row">${data.id}</th>
+                    <td>${data.company}</td>
+                    <td>${data.branch}</td>
+                    <td>${data.num}</td>
+                    <td>${data.category}</td>
+                    <td>${data.lat}</td>
+                    <td>${data.lon}</td>
+                </tr>`);
+                },
+                error: function (data) {
+                    console.log("Fail");
+                    if (data.status == 403) {
+                        alert(data.responseJSON());
+                        location.href = '{% url "accounts:signin" %}'
+                    }
+                }
+
+            })
+        })
+    })
+</script>
+{% endblock %}
