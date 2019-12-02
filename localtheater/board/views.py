@@ -38,7 +38,7 @@ def adminpage(request):
                 movie = Movie()
                 movie.theater_id_id = request.POST["theater_id"]
                 movie.movie_name = request.POST["movie_name"]
-                movie.show_time = request.POST["show_time"]
+                movie.show_time = " ".join([request.POST["show_time_date"],request.POST["show_time_time"]])
                 movie.save()
                 context = {
                     'theater_id' : movie.theater_id_id,

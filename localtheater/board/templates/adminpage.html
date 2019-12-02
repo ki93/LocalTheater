@@ -25,7 +25,8 @@
                 <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
                 <input type="text" readonly="true" class="form-control" placeholder="theater_id" name="theater_id">
                 <input type="text" class="form-control" placeholder="movie_name" name="movie_name">
-                <input type="text" class="form-control" placeholder="show_time 2006-10-25 14:30" name="show_time">
+                <input type="date" class="form-control" placeholder="show_time 2006-10-25 14:30" name="show_time_date">
+                <input type="time" class="form-control" placeholder="show_time 2006-10-25 14:30" name="show_time_time">
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
             </div>
         </form>
@@ -72,6 +73,7 @@
             console.log($(this).data('theater-id'));
             var theater_id = $(this).data('theater-id');
             $('input[name=theater_id]').val(theater_id);
+            $('input[name=show_time_date]').val(new Date().toISOString().substring(0, 10));
         })
         $(document).on('submit', '.movie-form', function (event) {
             event.preventDefault();
