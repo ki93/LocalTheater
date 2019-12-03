@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+<!-- 실제 표시 내용 -->
+{% block content %}
+<h1>Find with Name</h1>
+<div class="container">
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Movie Name</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody class="theater-tbody">
+                {% for movie in movies %}
+                {% if forloop.counter0|divisibleby:"5" %}
+                <tr class="theater-row"></tr>
+                <th scope="row"><button class="btn movie-register" data-theater-id="">
+                        {{movie.movie_name}}</button></th>
+                {% else %}
+                <td><button class="btn movie-register" data-theater-id="">
+                        {{movie.movie_name}}</button></td>
+                {% endif %}
+                {% if forloop.counter|divisibleby:"5" %}
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+{% endblock %}
+<!-- 자바스크립트 -->
+{% block script %}
+<script>
+</script>
+{% endblock %}

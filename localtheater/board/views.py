@@ -12,6 +12,16 @@ def index(request):
 def findmovie(request):
     return render(request, 'index.html')
 
+def findmoviename(request):
+    if request.method == "POST":
+        return render(request, 'index.html')
+    else:
+        movie = Movie.objects.all().values('movie_name').distinct()
+        context = {
+            'movies' : movie
+        }
+        return render(request, 'findnamepage.html', context)
+
 def adminpage(request):
     if request.method == "POST":
         if request.user.is_staff:
@@ -59,4 +69,14 @@ def adminpage(request):
         }
         return render(request, 'adminpage.html', context)
 
-    
+def theater_delete(request):
+    theater_id = request.POST["theater_id"]
+    theater = Theater.objects.get(id=theater_id)
+    if request.user.is_staff:
+        theater.delete()
+        context = {
+                'theater_id' : theater_id,
+            }
+        return HttpResponse(json.dumps(context), status=200, content_type="application/json")
+    else:
+        return HttpResponse(status=401)

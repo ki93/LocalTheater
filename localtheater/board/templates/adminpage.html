@@ -9,12 +9,12 @@
                 <h3>Theater</h3>
                 <input type="hidden" name="formname" value="theater">
                 <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
-                <input type="text" class="form-control" placeholder="company" name="company">
-                <input type="text" class="form-control" placeholder="branch" name="branch">
-                <input type="text" class="form-control" placeholder="num" name="num">
-                <input type="text" class="form-control" placeholder="category" name="category">
-                <input type="number" class="form-control" placeholder="lat" name="lat" step="any">
-                <input type="number" class="form-control" placeholder="lon" name="lon" step="any">
+                <input type="text" class="form-control theater-form-element" placeholder="company" name="company">
+                <input type="text" class="form-control theater-form-element" placeholder="branch" name="branch">
+                <input type="text" class="form-control theater-form-element" placeholder="num" name="num">
+                <input type="text" class="form-control theater-form-element" placeholder="category" name="category">
+                <input type="number" class="form-control theater-form-element" placeholder="lat" name="lat" step="any">
+                <input type="number" class="form-control theater-form-element" placeholder="lon" name="lon" step="any">
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
             </div>
         </form>
@@ -23,10 +23,10 @@
                 <h3>Movie</h3>
                 <input type="hidden" name="formname" value="movie">
                 <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
-                <input type="text" readonly="true" class="form-control" placeholder="theater_id" name="theater_id">
-                <input type="text" class="form-control" placeholder="movie_name" name="movie_name">
-                <input type="date" class="form-control" placeholder="show_time 2006-10-25 14:30" name="show_time_date">
-                <input type="time" class="form-control" placeholder="show_time 2006-10-25 14:30" name="show_time_time">
+                <input type="text" readonly="true" class="form-control movie-form-element" placeholder="theater_id" name="theater_id">
+                <input type="text" class="form-control movie-form-element" placeholder="movie_name" name="movie_name">
+                <input type="date" class="form-control movie-form-element" placeholder="show_time 2006-10-25 14:30" name="show_time_date">
+                <input type="time" class="form-control movie-form-element" placeholder="show_time 2006-10-25 14:30" name="show_time_time">
                 <button type="submit" class="btn btn-primary float-right">Submit</button>
             </div>
         </form>
@@ -45,11 +45,13 @@
                     <th scope="col">Category</th>
                     <th scope="col">Lat</th>
                     <th scope="col">Long</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody class="theater-tbody">
                 {% for theater in theaters %}
-                <tr class="theater-row" data-theater-id="{{theater.id}}">
+                <tr class="theater-row-{{theater.id}}">
                     <th scope="row">{{theater.id}}</th>
                     <td>{{theater.company}}</td>
                     <td>{{theater.branch}}</td>
@@ -57,6 +59,8 @@
                     <td>{{theater.category}}</td>
                     <td>{{theater.lat}}</td>
                     <td>{{theater.lon}}</td>
+                    <td><button class="btn btn-primary movie-register" data-theater-id="{{theater.id}}">Register Movie</button></td>
+                    <td><button class="btn btn-primary theater-delete" data-theater-id="{{theater.id}}">Delete</button></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -69,7 +73,28 @@
 {% block script %}
 <script>
     $(function () {
-        $(document).on('click', '.theater-row', function () {
+        $(document).on('click', '.theater-delete', function () {
+            var theater_id = $(this).data('theater-id');
+            console.log($(this));
+            $.ajax({
+                url: '{% url "board:theater_delete" %}',
+                method: 'POST',
+                data: {
+                    theater_id: theater_id,
+                    csrfmiddlewaretoken: "{{csrf_token}}"
+                },
+                success: function (data) {
+                    $('.theater-row-' + data.theater_id).remove();
+                },
+                error: function (data) {
+                    if (data.status == 401) {
+                        alert(data);
+                        location.href = '{% url "accounts:signin" %}'
+                    }
+                },
+            })
+        })
+        $(document).on('click', '.movie-register', function () {
             console.log($(this).data('theater-id'));
             var theater_id = $(this).data('theater-id');
             $('input[name=theater_id]').val(theater_id);
@@ -79,7 +104,7 @@
             event.preventDefault();
             console.log($(this).serialize());
             var data = $(this).serialize();
-            $(this).find('input').val("");
+            $(this).find('.movie-form-element').val("");
             $.ajax({
                 url: '{% url "board:adminpage" %}',
                 method: 'POST',
@@ -92,7 +117,7 @@
                 error: function (data) {
                     console.log("Fail");
                     if (data.status == 403) {
-                        alert(data.responseJSON());
+                        alert(data);
                         location.href = '{% url "accounts:signin" %}'
                     }
                 }
@@ -104,7 +129,7 @@
             event.preventDefault();
             console.log($(this).serialize());
             var data = $(this).serialize();
-            $(this).find('input').val("");
+            $(this).find('.theater-form-element').val("");
             $.ajax({
                 url: '{% url "board:adminpage" %}',
                 method: 'POST',
@@ -113,7 +138,7 @@
                     console.log("Success");
                     console.log(data);
                     console.log(data.company);
-                    $('.theater-tbody').append(`<tr class="theater-row" data-theater-id="{{theater.id}}">
+                    $('.theater-tbody').prepend(`<tr class="theater-row-{{theater.id}}">
                     <th scope="row">${data.id}</th>
                     <td>${data.company}</td>
                     <td>${data.branch}</td>
@@ -121,12 +146,14 @@
                     <td>${data.category}</td>
                     <td>${data.lat}</td>
                     <td>${data.lon}</td>
+                    <td><button class="btn btn-primary movie-register" data-theater-id="${data.id}">Register Movie</button></td>
+                    <td><button class="btn btn-primary theater-delete" data-theater-id="${data.id}">Delete</button></td>
                 </tr>`);
                 },
                 error: function (data) {
                     console.log("Fail");
                     if (data.status == 403) {
-                        alert(data.responseJSON());
+                        alert(data);
                         location.href = '{% url "accounts:signin" %}'
                     }
                 }
