@@ -13,11 +13,10 @@
             {% for theater in theaters %}
             {% if forloop.counter0|divisibleby:"5" %}
             <tr class="row">
-            <th scope="row"><button class="btn btn-branch-name" data-branch="{{theater.branch}}">
-                    {{theater.branch}}</button></th>
+            <th scope="row"><input type="button" class="btn btn-branch-name" value="{{theater.branch}} " data-id="{{theater.id}}">
+                    </th>
             {% else %}
-            <td><button class="btn btn-branch-name" data-branch="{{theater.branch}}">
-                    {{theater.branch}}</button></td>
+            <td><input type="button" class="btn btn-branch-name" value="{{theater.branch}}" data-id="{{theater.id}}"></td>
             {% endif %}
             {% if forloop.counter|divisibleby:"5" %}
             </tr>
@@ -29,4 +28,6 @@
         </tbody>
     </table>
 </div>
+
+<span class="float-right form-btn"><button type="submit" class="btn">Search</button></span>
 
