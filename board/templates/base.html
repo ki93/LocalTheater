@@ -23,7 +23,7 @@
                 Find Movies
             </a>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">Find with Location</a>
+                <a class="dropdown-item" href="{% url 'board:searchMovieByThreaterLocation'%}">Find with Location</a>
                 <a class="dropdown-item" href="{% url 'board:findmoviename' %}">Find with Name</a>
             </div>
         </span>
