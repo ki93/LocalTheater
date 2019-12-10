@@ -1,9 +1,10 @@
 from django.shortcuts import render,redirect
+from django.core import serializers
 # .models 현재 폴더 모델의 Article
 from django.http.response import HttpResponse
-from .models import Movie, Theater
+from .models import Movie, Theater, Room, TheaterMovie, Timetable
 import json
-
+# DRF
 # Create your views here.
 
 def index(request):
@@ -12,62 +13,69 @@ def index(request):
 def findmovie(request):
     return render(request, 'index.html')
 
+def findbyname(request):
+    title = request.GET.get("title")
+    theaters = Movie.objects.get(title=title).theaters.all()
+    remain_count = 5-theaters.count()%5
+    context = {
+        'theaters' : theaters,
+        'remain_count' : range(remain_count),
+    }
+    return render(request, 'categorypage.html', context)
+
 def findmoviename(request):
-    if request.method == "POST":
-        return render(request, 'index.html')
-    else:
-        movie = Movie.objects.all().values('movie_name').distinct()
-        context = {
-            'movies' : movie
-        }
-        return render(request, 'findnamepage.html', context)
+    movie = Movie.objects.all().values('title').distinct()
+    remain_count = 5-movie.count()%5
+    context = {
+        'remain_count' : range(remain_count),
+        'movies' : movie,
+    }
+    return render(request, 'findnamepage.html', context)
 
 def adminpage(request):
-    if request.method == "POST":
-        if request.user.is_staff:
-            if request.POST["formname"] == "theater":
-                theater = Theater()
-                theater.company = request.POST["company"]
-                theater.branch = request.POST["branch"]
-                theater.num = request.POST["num"]
-                theater.category = request.POST["category"]
-                theater.lat = request.POST["lat"]
-                theater.lon = request.POST["lon"]
-                theater.save()
-                context = {
-                'id' : theater.id,
-                'company' : theater.company,
-                'branch' : theater.branch,
-                'num' : theater.num,
-                'category' : theater.category,
-                'lat' : theater.lat,
-                'lon' : theater.lon,
-                }
-                return HttpResponse(json.dumps(context), content_type="application/json")
-            elif request.POST["formname"] == "movie":
-                movie = Movie()
-                movie.theater_id_id = request.POST["theater_id"]
-                movie.movie_name = request.POST["movie_name"]
-                movie.show_time = " ".join([request.POST["show_time_date"],request.POST["show_time_time"]])
-                movie.save()
-                context = {
-                    'theater_id' : movie.theater_id_id,
-                    'movie_name' : movie.movie_name,
-                    'show_time' : movie.show_time,
-                }
-                return HttpResponse(json.dumps(context), content_type="application/json")
+    if request.user.is_staff:
+        if request.method == "POST":
+                theater, created = Theater.objects.update_or_create(
+                    company = request.POST.get("company"),
+                    branch = request.POST.get("branch"),
+                    lat = request.POST.get("lat"),
+                    lon = request.POST.get("lon"),
+                )
+                
+                movie, created = Movie.objects.update_or_create(
+                    title = request.POST.get("title"),
+                )
+                room, created = Room.objects.update_or_create(
+                    theater_id = theater.id,
+                    name = request.POST.get("name"),
+                    category = request.POST.get("category"),
+                )
+                theatermovie, created = TheaterMovie.objects.update_or_create(
+                    theater_id = theater.id,
+                    movie_id = movie.id,
+                )
+                start_time_date = request.POST.get("start_time_date")
+                start_time_time = request.POST.get("start_time_time")
+                timetable, created = Timetable.objects.update_or_create(
+                    start_time = " ".join([start_time_date,start_time_time]),
+                    room_id = room.id,
+                    playinfo_id = theatermovie.id,
+                )
+                return redirect('board:adminpage')
         else:
+            theaters = Theater.objects.all().order_by("-created_at")
+            for theater in theaters:
+                print(theater.get_all_movies)
+                print(theater.movies.all())
+                for movie in theater.movies.all():
+                    print(theater.movies.all())
+                    print(movie.title)
             context = {
-                'status' : 401,
-                'message' : "Need to Sign in"
+                'theaters' : theaters,
             }
-            return HttpResponse(json.dumps(context), status=401, content_type="application/json")
+            return render(request, 'adminpage.html', context)
     else:
-        theater = Theater.objects.all().order_by("created_at").reverse()
-        context = {
-            'theaters' : theater
-        }
-        return render(request, 'adminpage.html', context)
+        return redirect('accounts:signin')    
 
 def theater_delete(request):
     theater_id = request.POST["theater_id"]

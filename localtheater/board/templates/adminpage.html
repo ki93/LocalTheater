@@ -3,69 +3,82 @@
 {% block content %}
 <h1 class="ml-5">Admin Page</h1>
 <div class="container mt-3">
-    <div class="row row-cols-2">
-        <form class="theater-form">
+    <form class="form">
+        <div class="row row-cols-2">
             <div class="form-group col">
                 <h3>Theater</h3>
-                <input type="hidden" name="formname" value="theater">
                 <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
-                <input type="text" class="form-control theater-form-element" placeholder="company" name="company">
-                <input type="text" class="form-control theater-form-element" placeholder="branch" name="branch">
-                <input type="text" class="form-control theater-form-element" placeholder="num" name="num">
-                <input type="text" class="form-control theater-form-element" placeholder="category" name="category">
-                <input type="number" class="form-control theater-form-element" placeholder="lat" name="lat" step="any">
-                <input type="number" class="form-control theater-form-element" placeholder="lon" name="lon" step="any">
-                <button type="submit" class="btn btn-primary float-right">Submit</button>
+                <input type="text" class="form-control form-element" placeholder="company" name="company" required>
+                <input type="text" class="form-control form-element" placeholder="branch" name="branch" required>
+                <input type="number" class="form-control form-element" placeholder="lat" name="lat" step="any" required>
+                <input type="number" class="form-control form-element" placeholder="lon" name="lon" step="any" required>
             </div>
-        </form>
-        <form class="movie-form">
-            <div class="movie-form-group col">
+            <div class="form-group col">
                 <h3>Movie</h3>
-                <input type="hidden" name="formname" value="movie">
-                <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
-                <input type="text" readonly="true" class="form-control movie-form-element" placeholder="theater_id" name="theater_id">
-                <input type="text" class="form-control movie-form-element" placeholder="movie_name" name="movie_name">
-                <input type="date" class="form-control movie-form-element" placeholder="show_time 2006-10-25 14:30" name="show_time_date">
-                <input type="time" class="form-control movie-form-element" placeholder="show_time 2006-10-25 14:30" name="show_time_time">
-                <button type="submit" class="btn btn-primary float-right">Submit</button>
+                <input type="text" class="form-control form-element" placeholder="title" name="title" required>
             </div>
-        </form>
-    </div>
+        </div>
+        <div class="row row-cols-2">
+            <div class="form-group col">
+                <h3>Room</h3>
+                <input type="text" class="form-control form-element" placeholder="name" name="name" required>
+                <input type="text" class="form-control form-element" placeholder="category" name="category" required>
+            </div>
+            <div class="form-group col">
+                <h3>Timetable</h3>
+                <input type="date" class="form-control form-element" placeholder="start_time 2006-10-25 14:30"
+                    name="start_time_date" required>
+                <input type="time" class="form-control form-element" placeholder="start_time 2006-10-25 14:30"
+                    name="start_time_time" required>
+                <button type="submit" class="btn btn-primary mt-1 float-right">Submit</button>
+            </div>
+        </div>
+    </form>
     <div class="row">
         Theater
     </div>
     <div class="row">
-        <table class="table table-hover">
+        <table class="table table-hover table-dark">
             <thead>
                 <tr>
                     <th scope="col">Id</th>
                     <th scope="col">Company</th>
                     <th scope="col">Branch</th>
-                    <th scope="col">Num</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Lat</th>
-                    <th scope="col">Long</th>
-                    <th scope="col"></th>
+                    <th scope="col">Movie</th>
+                    <th scope="col">Timetable</th>
                     <th scope="col"></th>
                 </tr>
             </thead>
             <tbody class="theater-tbody">
                 {% for theater in theaters %}
                 <tr class="theater-row-{{theater.id}}">
-                    <th scope="row">{{theater.id}}</th>
-                    <td>{{theater.company}}</td>
-                    <td>{{theater.branch}}</td>
-                    <td>{{theater.num}}</td>
-                    <td>{{theater.category}}</td>
-                    <td>{{theater.lat}}</td>
-                    <td>{{theater.lon}}</td>
-                    <td><button class="btn btn-primary movie-register" data-theater-id="{{theater.id}}">Register Movie</button></td>
-                    <td><button class="btn btn-primary theater-delete" data-theater-id="{{theater.id}}">Delete</button></td>
+                    <th scope="row" rowspan="{{theater.movies.count}}">{{theater.id}}</th>
+                    <td rowspan="{{theater.movies.count}}">{{theater.company}}</td>
+                    <td rowspan="{{theater.movies.count}}">{{theater.branch}}</td>
+                    {% for theatermovie in theater.theatermovie_set.all %}
+                    {% if  forloop.counter != 1 %}
+                <tr>
+                    {% endif %}
+                    <td rowspan="1">
+                        {{theatermovie.movie.title}}
+                    </td>
+                    <td rowspan="1">
+                        <ul>
+                            <li>
+                            {% for timetable in theatermovie.timetable_set.all %}
+                            {{timetable.room.name}}
+                                <span class="p-2">{{timetable.start_time|time:"H:i"}}</span>
+                            {% endfor %}
+                            </li>
+                        </ul>
+                    </td>
+                    <td><button class="btn btn-light theater-delete" data-theater-id="{{theater.id}}">Delete</button>
+                    </td>
+                    {% endfor %}
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-
     </div>
 </div>
 {% endblock %}
@@ -73,6 +86,7 @@
 {% block script %}
 <script>
     $(function () {
+        $('[type=date]').val(new Date().toISOString().substring(0, 10));
         $(document).on('click', '.theater-delete', function () {
             var theater_id = $(this).data('theater-id');
             console.log($(this));
@@ -94,17 +108,12 @@
                 },
             })
         })
-        $(document).on('click', '.movie-register', function () {
-            console.log($(this).data('theater-id'));
-            var theater_id = $(this).data('theater-id');
-            $('input[name=theater_id]').val(theater_id);
-            $('input[name=show_time_date]').val(new Date().toISOString().substring(0, 10));
-        })
-        $(document).on('submit', '.movie-form', function (event) {
+        $(document).on('submit', '.form', function (event) {
             event.preventDefault();
             console.log($(this).serialize());
             var data = $(this).serialize();
-            $(this).find('.movie-form-element').val("");
+            $(this).find('.form-element').val("");
+            $('[type=date]').val(new Date().toISOString().substring(0, 10));
             $.ajax({
                 url: '{% url "board:adminpage" %}',
                 method: 'POST',
@@ -112,43 +121,7 @@
                 success: function (data) {
                     console.log("Success");
                     console.log(data);
-                    console.log(data.movie_name);
-                },
-                error: function (data) {
-                    console.log("Fail");
-                    if (data.status == 403) {
-                        alert(data);
-                        location.href = '{% url "accounts:signin" %}'
-                    }
-                }
-
-            })
-
-        })
-        $(document).on('submit', '.theater-form', function (event) {
-            event.preventDefault();
-            console.log($(this).serialize());
-            var data = $(this).serialize();
-            $(this).find('.theater-form-element').val("");
-            $.ajax({
-                url: '{% url "board:adminpage" %}',
-                method: 'POST',
-                data: data,
-                success: function (data) {
-                    console.log("Success");
-                    console.log(data);
-                    console.log(data.company);
-                    $('.theater-tbody').prepend(`<tr class="theater-row-{{theater.id}}">
-                    <th scope="row">${data.id}</th>
-                    <td>${data.company}</td>
-                    <td>${data.branch}</td>
-                    <td>${data.num}</td>
-                    <td>${data.category}</td>
-                    <td>${data.lat}</td>
-                    <td>${data.lon}</td>
-                    <td><button class="btn btn-primary movie-register" data-theater-id="${data.id}">Register Movie</button></td>
-                    <td><button class="btn btn-primary theater-delete" data-theater-id="${data.id}">Delete</button></td>
-                </tr>`);
+                    $('.form').append(data);
                 },
                 error: function (data) {
                     console.log("Fail");

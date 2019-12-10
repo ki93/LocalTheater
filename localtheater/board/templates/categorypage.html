@@ -1,0 +1,32 @@
+<div class="row branch-row">
+    <table class="table ">
+        <thead>
+            <tr>
+                <th scope="col">Category</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody class="branch-tbody">
+            {% for theater in theaters %}
+            {% if forloop.counter0|divisibleby:"5" %}
+            <tr class="row">
+            <th scope="row"><button class="btn btn-branch-name" data-branch="{{theater.branch}}">
+                    {{theater.branch}}</button></th>
+            {% else %}
+            <td><button class="btn btn-branch-name" data-branch="{{theater.branch}}">
+                    {{theater.branch}}</button></td>
+            {% endif %}
+            {% if forloop.counter|divisibleby:"5" %}
+            </tr>
+            {% endif %}
+            {% endfor %}
+            {% for i in remain_count %}
+            <td></td>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+

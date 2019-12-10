@@ -31,8 +31,6 @@
         | `id` | NUM | `pk` |
         | `company` | CharField(max_length=30) | 브랜드 |
         | `branch` | CharField(max_length=50) | 지점명 |
-        | `num` | CharField(max_length=20) | ex.1관, 2관 |
-        | `category` | CharField(max_length=20) | ex.일반관,특별관 ... |
         | `created_at` | DateTimeField(auto_now_add=True) | ex.일반관,특별관 ... |
         | `updated_at` | DateTimeField(auto_now=True) | ex.일반관,특별관 ... |
         | `lat` | DecimalField(max_digits=9, decimal_places=6) | 위도 |
@@ -41,12 +39,34 @@
         | 이름 | 형식 | 비고 |
         |:---:|:---:|:---:|
         | `id` | NUM | `pk` |
-        | `theater_id` | ForeignKey(Theater, on_delete=models.CASCADE) | `fk` |
-        | `movie_name` | CharField(max_length=100) |  |
-        | `show_time` | DateTimeField() | 상영 시작 시간 |
-        | `created_at` | DateTimeField(auto_now_add=True) | ex.일반관,특별관 ... |
-        | `updated_at` | DateTimeField(auto_now=True) | ex.일반관,특별관 ... |
-        
+        | `theater` | ManyToManyField(Theater, through='TheaterMovie', related_name='movies') | |
+        | `title` | CharField(max_length=100) |  |
+        | `created_at` | DateTimeField(auto_now_add=True) |  |
+        | `updated_at` | DateTimeField(auto_now=True) |  |
+
+    - **Room**
+        | 이름 | 형식 | 비고 |
+        |:---:|:---:|:---:|
+        | `id` | NUM | `pk` |
+        | `theater` | ForeignKey(Theater, on_delete=models.CASCADE) | |
+        | `name` | CharField(max_length=200) |  |
+        |`category`| CharField(max_length=20) |  |
+    
+    - **TheaterMovie**
+        | 이름 | 형식 | 비고 |
+        |:---:|:---:|:---:|
+        | `id` | NUM | `pk` |
+        | `theater` | ForeignKey(Theater, on_delete=models.CASCADE) | |
+        | `movie` | ForeignKey(Movie, on_delete=models.CASCADE) |  |
+
+    - **Timetable**
+        | 이름 | 형식 | 비고 |
+        |:---:|:---:|:---:|
+        | `id` | NUM | `pk` |
+        | `start_time` | DateTimeField() |  |
+        | `room` | ForeignKey(Room, on_delete=models.CASCADE) | |
+        | `playinfo` | ForeignKey(TheaterMovie, on_delete=models.CASCADE) |  |
+
     - **review**
         | 이름 | 형식 | 비고 |
         |:---:|:---:|:---:|
