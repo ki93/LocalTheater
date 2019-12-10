@@ -9,8 +9,8 @@ class Theater(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # DecimalField 9글자 십진수 소수자리 6개까지
-    lat = models.DecimalField(max_digits=9, decimal_places=6)
-    lon = models.DecimalField(max_digits=9, decimal_places=6)
+    lat = models.DecimalField(max_digits=10, decimal_places=7)
+    lon = models.DecimalField(max_digits=10, decimal_places=7)
 
     def get_all_movies(self):
         return self.movies.title
@@ -32,6 +32,7 @@ class TheaterMovie(models.Model):
 class Timetable(models.Model):
     start_time = models.DateTimeField()
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    playinfo = models.ForeignKey(TheaterMovie, on_delete=models.CASCADE)
-
+    playInfo = models.ForeignKey(TheaterMovie, on_delete=models.CASCADE)
+    remainSeat = models.CharField(max_length=15)
+    link = models.TextField()
 

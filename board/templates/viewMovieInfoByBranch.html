@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+<!-- 실제 표시 내용 -->
+{% block content %}
+<h1 xmlns:visibi="http://www.w3.org/1999/xhtml">Find with Location</h1>
+<div class="container">
+    <table>
+        <h3>Filter</h3>
+        <tr>
+            <td>영화 종류</td>
+            <td>
+                <select name="SelectScreenFilter" id="SelectScreenFilter">
+                    <option value="normal" selected>일반</option>
+                    <option value="special">특수</option>
+                </select>
+            </td>
+            <td>
+                시간
+            </td>
+        </tr>
+    </table>
+    {% for info in CGV_normal_info %}
+    <tr>
+        <td>
+            {{ info.branch }}
+        </td>
+        <td>
+            {{ info.special }}
+        </td>
+        <td>
+            {{ info.movie }}
+        </td>
+        <td>
+            {{ info.time }}
+        </td>
+        <td>
+            {{ info.remainSeat }}
+        </td>
+    </tr>
+    <br>
+    {% endfor %}
+</div>
+{% endblock %}
+<!-- 자바스크립트 -->
+{% block script %}
+<script>
+</script>
+{% endblock %}
