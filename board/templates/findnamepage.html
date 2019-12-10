@@ -2,82 +2,104 @@
 <!-- 실제 표시 내용 -->
 {% block content %}
 <h1 class="ml-5">Find with Name</h1>
-<div class="btn-group-toggle" data-toggle="buttons">
-  <label class="btn active">
-    <input type="checkbox" checked> Checked
-  </label>
-  <label class="btn active">
-    <input type="checkbox" checked> Checked
-  </label>
-</div>
-<div class="container mt-5">
-    <div class="row movie-name-row">
-        <table class="table ">
-            <thead>
-                <tr>
-                    <th scope="col">Movie Name</th>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody class="tbody">
-                {% for movie in movies %}
-                {% if forloop.counter0|divisibleby:"5" %}
-                <tr class="row">
-                <th scope="row"><button class="btn btn-movie-name" data-title="{{movie.title}}">
-                        {{movie.title}}</button></th>
-                {% else %}
-                <td><button class="btn btn-movie-name" data-title="{{movie.title}}">
-                        {{movie.title}}</button></td>
-                {% endif %}
-                {% if forloop.counter|divisibleby:"5" %}
-                </tr>
-                {% endif %}
-                {% endfor %}
-                {% for i in remain_count %}
-                <td></td>
-                {% endfor %}
-                </tr>
-            </tbody>
-        </table>
-
+<form action="" class="form">
+    <div class="container mt-5">
+        <div class="row movie-name-row">
+            <table class="table ">
+                <thead>
+                    <tr>
+                        <th scope="col">Movie Name</th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody class="tbody">
+                    {% for movie in movies %}
+                    {% if forloop.counter0|divisibleby:"5" %}
+                    <tr class="row">
+                        <th scope="row"><input type="button" class="btn btn-movie-name" 
+                                value="{{movie.title}}" data-id="{{movie.id}}" data-type="title">
+                        </th>
+                        {% else %}
+                        
+                        <td><input type="button" class="btn btn-movie-name" 
+                                value="{{movie.title}}" data-id="{{movie.id}}" data-type="title">
+                        </td>
+                        {% endif %}
+                        {% if forloop.counter|divisibleby:"5" %}
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                    {% for i in remain_count %}
+                    <td></td>
+                    {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+</form>
 {% endblock %}
 <!-- 자바스크립트 -->
 {% block script %}
 <script>
-var globaltitle;
     $(function () {
-        $(document).on('click','.btn-movie-name',function () {
-            var localtitle = $(this).data("title");
-            if(confirm("Wanna find movie with this name?")){
-                console.log(localtitle);
+        $(document).on('click', '.btn-movie-name', function () {
+            var title = $(this).val();
+
+            if (confirm("Wanna find movie with this name?")) {
+                $('.btn-movie-name').removeClass("focus");
+                $(this).addClass("focus");
+                var type = $(this).data("type");
+                console.log(title);
                 $.ajax({
-                url: '{% url "board:findbyname" %}',
-                method: 'GET',
-                data:{
-                    title : localtitle,
-                },
-                success: function (data) {
-                    globaltitle = localtitle;
-                    $('.branch-row').remove();
-                    console.log(data);
-                    $('.container').append(data);
-                    console.log("success");
-                },
-                error: function (data) {
-                   console.log("fail");
-                },
-            })
+                    url: '{% url "board:findbyname" %}',
+                    method: 'GET',
+                    data: {
+                        title: title,
+                        type: type,
+                    },
+                    success: function (data) {
+                        $('.branch-row').remove();
+                        $('.result-row').remove();
+                        $('.form-btn').remove();
+                        $('.container').append(data);
+                        console.log("success");
+                    },
+                    error: function (data) {
+                        console.log("fail");
+                    },
+                })
             }
         })
-        $(document).on('click','.btn-branch-name',function(){
-            var branch = $(this).data("branch");
-            console.log(branch);
-            console.log(globaltitle);
+        $(document).on('click', '.btn-branch-name', function () {
+            $(this).toggleClass("focus");
+        })
+        $(document).on('submit', '.form', function () {
+            event.preventDefault();
+            var idString = '';
+            $('.focus').each(function (index, obj) {
+                {% comment %} -를 붙이는 이유는 url에서 -만 그대로 인식 {% endcomment %}
+                idString += $(this).data('id') + '-';
+            });
+            
+            $.ajax({
+                    url: '{% url "board:findbyname" %}',
+                    method: 'GET',
+                    data: {
+                        selected: idString,
+                    },
+                    success: function (data) {
+                        $('.result-row').remove();
+                        console.log("work")
+                        $('.container').append(data);
+                    },
+                    error: function (data) {
+                        console.log("fail");
+                    },
+                })
         })
     })
 </script>
