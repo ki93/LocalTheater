@@ -7,7 +7,7 @@ from .CGVMovieInfoParsing import CGVMovieInfo
 from .LotteMovieInfoParsing import LOTTEMovieInfo
 from .MEGABOXMovieInfoParsing import MEGABOXMovieInfo
 from multiprocessing.pool import ThreadPool
-import json
+import simplejson as json
 # DRF
 # Create your views here.
 
@@ -79,11 +79,21 @@ def selectBranch(request):
             'lon' : 127.027017
         }
     }
+    Branchs = Theater.objects.all()
+    Branch_location_info = []
+    for branch in Branchs:
+        branch_info = {
+            'name' : branch.company+"_  "+branch.branch,
+            'lat' : branch.lat,
+            'lon' : branch.lon,
+        }
+        Branch_location_info.append(branch_info)
+
     context = {
         'CGV_branchs': CGV_branchs,
         'Lotte_branchs': Lotte_branchs,
         'MEGABOX_branchs': MEGABOX_branchs,
-        'branchs_locations' : json.dumps(branchs_locations)
+        'branchs_locations' : json.dumps(Branch_location_info)
     }
 
     return render(request, "selectBranch.html", context)
