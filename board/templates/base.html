@@ -8,6 +8,8 @@
     <title>Document</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/e45a93f83e.js" crossorigin="anonymous"></script>
+
 
 </head>
 <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm fixed-top">
@@ -27,7 +29,7 @@
                 <a class="dropdown-item" href="{% url 'board:findmoviename' %}">Find with Name</a>
             </div>
         </span>
-        <a class="p-2 text-dark" href="#">Reviews</a>
+        <a class="p-2 text-dark" href="{% url 'reviews:reviews' %}">Reviews</a>
         {% if user.is_staff %}
         <a class="text-dark p-2" href="{% url 'board:adminpage' %}">Admin Page</a>
         {% endif %}

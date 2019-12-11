@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block stylesheet %}
+<style>
+    .container {
+        padding-right: 10em !important;
+        padding-left: 10em !important;
+    }
+
+    .fa-back-colorgray {
+        color: lightgray;
+    }
+
+    .fa-back-colorred {
+        color: red;
+    }
+</style>
+{% endblock %}
+<!-- 실제 표시 내용 -->
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <form>
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+            <div class="card-body">
+                <textarea name="contents" class="form-control" rows="5"></textarea>
+            </div>
+            <div class="card-footer text-right">
+                <input type="submit" class="btn btn-primary" value="작성하기">
+            </div>
+        </form>
+    </div>
+</div>
+<div class="container">
+    {% for review in reviews %}
+    <div class="row mt-4">
+        <div class="card col-12">
+            <div class="card-body" style="min-height: 9rem;">
+                {% for tag in article.tags.all %}
+                #{{tag.tag}}
+                {% endfor %}
+                <p class="card-text">{{article.contents}}
+                </p>
+            </div>
+            <div class="card-body">
+                <span class="float-left">
+                    {% if user in article.user_likes.all %}
+                    <a class="likes" data-article-id="{{article.id}}"><i class="fas fa-heart fa-back-colorred"></i><span>{{article.user_likes.count}}</span></a>
+                    {% else %}
+                    <a class="likes" data-article-id="{{article.id}}"><i class="fas fa-heart fa-back-colorgray"></i><span>{{article.user_likes.count}}</span></a>
+                    {% endif %}
+                </span>
+                <span class="float-right text-muted">
+                    {% if article.user_id == user.id %}
+                    <a href="{% url 'edit' article.id %}" class="btn btn-info"><i
+                            class="fas fa-trash-restore-alt"></i></a>
+                    <a href="{% url 'delete' article.id %}" class="btn btn-danger"><i class="fas fa-eraser"></i></a>
+                    {% else %}
+                    created by {{article.user.username}}
+                    {% endif %}
+                </span>
+            </div>
+            <ul class="list-group comment-{{article.id}}">
+                <li class="list-group-item">
+                    <form action="" class="commentForm" id="commentForm-{{article.id}}">
+                        <input type="hidden" class="formMethod" name="form_method" value="create">
+                        <input type="hidden" name="commentId" class="commentId">
+                        <input type="hidden" name="articleId" class="articleId" value="{{article.id}}">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+                        <div class="row">
+                            <div class="col-9"><input class="form-control commentInput" name="contents" type="text"
+                                    placeholder="댓글을 작성하시오"></div>
+                            <div class="col-3 text-right"><button type="submit" class="btn btn-primary"
+                                    name="{{article.id}}"><i class="fas fa-reply"></i> </button></div>
+                        </div>
+                    </form>
+                </li>
+                {% for comment in article.comments %}
+                <li class="list-group-item" id="comment-{{comment.id}}">
+                    <i class="fas fa-comment-alt"></i>
+                    <span class="contents">{{comment.contents}}</span>
+                    <span class="float-right text-muted">
+                        {% if comment.user_id == user.id %}
+                        <button class="btn btn-info editComment" data-article-id="{{comment.article_id}}"
+                            data-contents="{{comment.contents}}" data-id="{{comment.id}}"><i
+                                class="fas fa-trash-restore-alt"></i></button>
+                        <button class="btn btn-danger deleteComment" data-id="{{comment.id}}"><i
+                                class="fas fa-eraser"></i></button>
+                        {% else %}
+                        <i class="far fa-user-circle"></i>
+                        {{comment.user.username}}
+                        {% endif %}
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+<!-- 자바스크립트 -->
+{% block script %}
+<script>
+   
+</script>
+{% endblock %}

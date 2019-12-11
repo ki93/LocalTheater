@@ -91,7 +91,6 @@
     <span style="font-size:xx-large"> Select Location</span>
     <button type="submit" class="btn btn-outline-success" id="submitButton" style="float: right">영화 검색하기</button>
     </form>
-<button class="btn btn-outline-success" id="submitButton" style="float: right">영화 검색하기</button>
 </div>
 {% endblock %}
 <!-- 자바스크립트 -->
@@ -171,7 +170,10 @@
                     method: 'GET',
                     data: data,
                     success: function (data) {
+                        $('.result-row').remove();
+                        console.log(data);
                         console.log("success");
+                        $('.container').append(data);
                     },
                     error: function (data) {
                         console.log("fail");

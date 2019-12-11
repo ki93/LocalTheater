@@ -163,10 +163,32 @@ def index(request):
     return render(request, 'index.html')
 
 def findbylocate(request):
-    for datas in request.GET.get('CGV'):
-        data += datas
-    print(data)
-    pass
+    data = dict(request.GET)
+    try:
+        CGV = data['CGV']
+        CGVtheaters = Theater.objects.filter(company="CGV",branch__in=CGV)
+    except:
+        CGVtheaters = Theater.objects.none()
+    try:
+        MEGABOX = data['MEGABOX']
+        MEGABOXtheaters = Theater.objects.filter(company="MEGABOX",branch__in=MEGABOX)
+
+    except:
+        MEGABOXtheaters = Theater.objects.none()
+    try:
+        LOTTE = data['Lotte']
+        LOTTEtheaters = Theater.objects.filter(company="Lotte",branch__in=LOTTE)
+    except:
+        LOTTEtheaters = Theater.objects.none()
+    theaters = CGVtheaters | MEGABOXtheaters | LOTTEtheaters
+    theaters_id = []
+    for theater in theaters:
+         theaters_id.append(theater.id)
+    theatermovies = TheaterMovie.objects.filter(theater_id__in=theaters_id)
+    context = {
+        'theatermovies' : theatermovies,
+    }
+    return render(request, 'locateresult.html',context)
 
 def findbyname(request):
     if request.GET.get("type") == "title":
@@ -192,7 +214,7 @@ def findbyname(request):
         context = {
             'theatermovies' : theatermovies,
         }
-        return render(request,'result.html', context)
+        return render(request,'nameresult.html', context)
 
 def findmoviename(request):
     movies = Movie.objects.all().values('title', 'id')
@@ -206,15 +228,7 @@ def findmoviename(request):
 def adminpage(request):
     if request.user.is_staff:
         if request.method == "POST":
-                theater, created = Theater.objects.update_or_create(
-                    company=request.POST.get("company"), 
-                    branch=request.POST.get("branch"),
-                    defaults={
-                    'company' : request.POST.get("company"),
-                    'branch' : request.POST.get("branch"),
-                    'lat' : request.POST.get("lat"),
-                    'lon' : request.POST.get("lon")}
-                )
+                theater = Theater.objects.get(company="CGV",branch="강남")
                 
                 movie, created = Movie.objects.update_or_create(
                     title = request.POST.get("title"), defaults={
