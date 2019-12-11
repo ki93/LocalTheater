@@ -162,25 +162,38 @@ def index(request):
     return render(request, 'index.html')
 
 
-def findmovie(request):
-    return render(request, 'index.html')
-
 def findbyname(request):
-    title = request.GET.get("title")
-    theaters = Movie.objects.get(title=title).theaters.all()
-    remain_count = 5-theaters.count()%5
-    context = {
-        'theaters' : theaters,
-        'remain_count' : range(remain_count),
-    }
-    return render(request, 'categorypage.html', context)
+    if request.GET.get("type") == "title":
+        title = request.GET.get("title")
+        theaters = Movie.objects.get(title=title).theaters.all()
+        remain_count = 5-theaters.count()%5
+        context = {
+            'theaters' : theaters,
+            'remain_count' : range(remain_count),
+        }
+        return render(request, 'categorypage.html', context)
+    else:
+        id_string = request.GET.get('selected')
+        movie_id = id_string.split('-')[0]
+        theater_id = list(map(int,id_string.split('-')[1:-1]))
+        movie_title = Movie.objects.get(id=movie_id).title
+        theaters = Theater.objects.filter(id__in=theater_id)
+        theatermovies = TheaterMovie.objects.filter(movie_id__in=movie_id, theater_id__in=theater_id)
+        print(movie_id)
+        print(theaters)
+        print(movie_title) 
+        print(theatermovies)
+        context = {
+            'theatermovies' : theatermovies,
+        }
+        return render(request,'result.html', context)
 
 def findmoviename(request):
-    movie = Movie.objects.all().values('title').distinct()
-    remain_count = 5-movie.count()%5
+    movies = Movie.objects.all().values('title', 'id')
+    remain_count = 5-movies.count()%5
     context = {
         'remain_count' : range(remain_count),
-        'movies' : movie,
+        'movies' : movies,
     }
     return render(request, 'findnamepage.html', context)
 
