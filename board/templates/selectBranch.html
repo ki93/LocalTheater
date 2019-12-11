@@ -3,8 +3,7 @@
 {% block content %}
 <div class="container">
         <div id="map" style="height:400px;"></div>
-    <form action="{% url 'board:resultMovieInfoByLocation' %}" method="POST">
-        {% csrf_token %}
+    <form class="form">
         <table class="table" width="100%">
             <thead>
                 <tr>
@@ -88,7 +87,7 @@
             </tbody>
         </table>
     <span style="font-size:xx-large"> Select Location</span>
-    <button class="btn btn-outline-success" id="submitButton" style="float: right">영화 검색하기</button>
+    <button type="submit" class="btn btn-outline-success" id="submitButton" style="float: right">영화 검색하기</button>
     </form>
 
 </div>
@@ -147,6 +146,23 @@
             $('tbody').attr('style','display:none');
             $('#'+companyName+"_branch").attr('style','display:');
         });
+
+        $(document).on('submit', '.form', function () {
+            event.preventDefault();
+            var data = $(this).serialize()
+            console.log($(this).serialize());
+            $.ajax({
+                    url: '{% url "board:findbylocate" %}',
+                    method: 'GET',
+                    data: data,
+                    success: function (data) {
+                        console.log("success");
+                    },
+                    error: function (data) {
+                        console.log("fail");
+                    },
+                })
+        })
 
     });
 </script>
