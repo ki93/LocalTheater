@@ -23,9 +23,9 @@ class CGVMovieInfo :
 
             theaters = movieResult.find_all('div',class_='type-hall')
             for theater in theaters:
-                if(branch_name == "천호") :
-                    print(theater)
                 screenType = theater.find('span', class_="screentype")
+                hall_info = theater.find_all('li')
+                hall = hall_info[1].getText().strip()
                 if screenType != None:
                     screenType = screenType.getText().strip()
                 else:
@@ -40,6 +40,7 @@ class CGVMovieInfo :
                         'branch': branch_name,
                         'movie': movieResult.find('strong').getText().strip(),
                         'viewGrade': theater.find('li').getText().strip(),
+                        'hall' : hall,
                         'special' : screenType,
                         "time": showResult.find('em').getText().strip(),
                         "link": mainUrl + showResult['href'],

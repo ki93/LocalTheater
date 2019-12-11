@@ -5,6 +5,8 @@
         <div id="map" style="height:400px;"></div>
     <form action="{% url 'board:resultMovieInfoByLocation' %}" method="POST">
         {% csrf_token %}
+        <span style="font-size:xx-large"> Select Location</span>
+        <!--<input type="text" name="" id="selectLocation" style="float: right" value="">-->
         <table class="table" width="100%">
             <thead>
                 <tr>
@@ -87,15 +89,13 @@
                 </tr>
             </tbody>
         </table>
-    <span style="font-size:xx-large"> Select Location</span>
-    <button class="btn btn-outline-success" id="submitButton" style="float: right">영화 검색하기</button>
     </form>
-
+<button class="btn btn-outline-success" id="submitButton" style="float: right">영화 검색하기</button>
 </div>
 {% endblock %}
 <!-- 자바스크립트 -->
 {% block script %}
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3b81f929ee084f4abd4849adf036938f"></script>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=3b81f929ee084f4abd4849adf036938f&libraries=services"></script>
 <script>
     var Branchs = JSON.parse('{{branchs_locations|safe}}');
     $(document).ready(function(){
@@ -116,19 +116,32 @@
 
             var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
 
-            for(branch_val in Branchs){
 
+            for(branch_val in Branchs){
+                var pinImgSrc;
                 var position = new kakao.maps.LatLng(Branchs[branch_val]["lat"],Branchs[branch_val]["lon"]);
+                if (Branchs[branch_val]['company'] == "CGV"){
+                    pinImgSrc = "https://carlisletheacarlisletheatre.org/transparent250_/location-clipart-vector-8.png";
+                }
+                else if (Branchs[branch_val]['company'] == "MEGABOX") {
+                    pinImgSrc = "https://carlisletheacarlisletheatre.org/images/map-pin-icon-blue-9.png";
+                }
+                else {
+                    pinImgSrc = "https://carlisletheacarlisletheatre.org/images/map-icon-red-9.png";
+                }
+                var imgSize = new kakao.maps.Size(24,35);
+                var markerImg = new kakao.maps.MarkerImage(pinImgSrc,imgSize);
                 var marker = new kakao.maps.Marker({
                     map : map,
                     position : position,
-                    clickable : true
+                    clickable : true,
+                    image : markerImg
                 });
                 var iwContent = '<div>'+Branchs[branch_val]['name']+'</div>';
 
                 var infowindow = new kakao.maps.InfoWindow({
                     content : iwContent,
-                    removable : true,
+                    removable : true
 
                 });
 
