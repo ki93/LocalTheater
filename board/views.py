@@ -83,7 +83,8 @@ def selectBranch(request):
     Branch_location_info = []
     for branch in Branchs:
         branch_info = {
-            'name' : branch.company+"_  "+branch.branch,
+            'company' : branch.company,
+            'name' : branch.branch,
             'lat' : branch.lat,
             'lon' : branch.lon,
         }

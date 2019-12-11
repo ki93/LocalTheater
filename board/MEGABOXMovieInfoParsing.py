@@ -24,6 +24,7 @@ class MEGABOXMovieInfo:
             if temp != '':
                 movieName = TheaterParse.find('strong').getText().strip()
                 movieGrade = TheaterParse.find('span', class_='age_m').getText().strip()
+                hall = TheaterParse.find('th', id='th_theaterschedule_room').find('div').getText().strip()
 
             showingParses = TheaterParse.find_all('div',class_='cinema_time')
 
@@ -41,6 +42,7 @@ class MEGABOXMovieInfo:
                     'branch' : branch_name,
                     'movie': movieName,
                     'viewGrade': movieGrade,
+                    'hall' : hall,
                     'special' : '일반',
                     "time" : showingParse.find('span',class_='time').getText().strip(),
                     "link" : TicktetingURL,
@@ -74,14 +76,17 @@ class MEGABOXMovieInfo:
         }
         MEGABOXSpecial = []
         MEGABOXSpecial.append({
+            'special' : 'The Boutique',
             'screenType' : '10',
             'branch' : ['성수','센트럴','코엑스']
         })
         MEGABOXSpecial.append({
+            'special' : 'MX',
             'screenType': '01',
             'branch': ['목동', '상암월드컵경기장', '성수','코엑스']
         })
         MEGABOXSpecial.append({
+            'special' : 'comfort',
             'screenType': '12',
             'branch': ['동대문', '목동', '상봉','상암월드컵경기장','신촌','코엑스']
         })
@@ -106,7 +111,7 @@ class MEGABOXMovieInfo:
                     if temp != '':
                         movieName = TheaterParse.find('strong').getText().strip()
                         movieGrade = TheaterParse.find('span', class_='age_m').getText().strip()
-                        cinema = TheaterParse.find('th', id='th_theaterschedule_room').find('div').getText().strip()
+                        hall = TheaterParse.find('th', id='th_theaterschedule_room').find('div').getText().strip()
                     showingParses = TheaterParse.find_all('div',class_='cinema_time')
 
                     #영화 관별
@@ -123,7 +128,8 @@ class MEGABOXMovieInfo:
                             'branch' : branch,
                             'movie': movieName,
                             'viewGrade': movieGrade,
-                            'special' : cinema,
+                            'hall' : hall,
+                            'special' : special['special'],
                             "time" : showingParse.find('span',class_='time').getText().strip(),
                             "link" : TicktetingURL,
                             "remainSeat" : remainSeat,
