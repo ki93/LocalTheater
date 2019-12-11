@@ -228,11 +228,20 @@ def findmoviename(request):
 def adminpage(request):
     if request.user.is_staff:
         if request.method == "POST":
-                theater = Theater.objects.get(company="CGV",branch="강남")
-                
+                theater, created = Movie.objects.update_or_create(
+                    company = request.POST.get("company"), 
+                    branch = request.POST.get("branch"),
+                    defaults={
+                        'company' : request.POST.get("company"),
+                        'branch' : request.POST.get("branch"), 
+                        'lat' : request.POST.get("lat"), 
+                        'lon' : request.POST.get("lon"),
+                        }
+                )
+
                 movie, created = Movie.objects.update_or_create(
                     title = request.POST.get("title"), defaults={
-                        'title' : request.POST.get("title")
+                        'title' : request.POST.get("title"),
                     }
                 )
                 room, created = Room.objects.update_or_create(
