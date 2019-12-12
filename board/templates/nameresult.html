@@ -25,7 +25,7 @@
                         <div class="card-columns">
                             {% for timetable in theatermovie.timetable_set.all %}
                             <div class="card bg-secondary" OnClick="location.href ='{{timetable.link}}'" style="cursor:pointer;" >
-                                {{timetable.room.name}}<br>
+                                {{timetable.room.category}} / {{timetable.room.name}}<br>
                                 {{timetable.start_time|time:"H:i"}} / {{timetable.remainSeat}}
                             </div>
                             
