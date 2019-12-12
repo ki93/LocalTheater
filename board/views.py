@@ -228,7 +228,7 @@ def findmoviename(request):
 def adminpage(request):
     if request.user.is_staff:
         if request.method == "POST":
-                theater, created = Movie.objects.update_or_create(
+                theater, created = Theater.objects.update_or_create(
                     company = request.POST.get("company"), 
                     branch = request.POST.get("branch"),
                     defaults={

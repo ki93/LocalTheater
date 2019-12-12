@@ -7,8 +7,28 @@
 {% block content %}
 <div class="container mt-5">
     <div class="card">
-        <form>
+        <p class="mt-3 ml-4">
+            <button class="btn btn-primary btn-company" type="button" data-toggle="collapse"
+                data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                COMPANY
+            </button>
+            <button class="btn btn-primary btn-branch" type="button" data-toggle="collapse"
+                data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                BRANCH
+            </button>
+            <button class="btn btn-primary btn-room" type="button" data-toggle="collapse" data-target="#collapseExample"
+                aria-expanded="false" aria-controls="collapseExample">
+                ROOM
+            </button>
+        </p>
+        <div class="collapse" id="collapseExample">
+            <div class="card card-body card-body-collapse">
+
+            </div>
+        </div>
+        <form class="review-form">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{csrf_token}}">
+            <input type="hidden" name="room_id">
             <div class="card-body">
                 <textarea name="contents" class="form-control" rows="5"></textarea>
             </div>
@@ -22,16 +42,21 @@
     {% for review in reviews %}
     <div class="row mt-4">
         <div class="card col-12">
-            <div class="card-body" style="min-height: 9rem;">
-                <p class="card-text">{{article.contents}}
+            <div class="card-body">
+                <span class="card-text text-primary">{{review.room.theater.company}}
+                </span><span class="card-text text-primary">{{review.room.theater.branch}}
+                </span>
+                <span class="card-text text-primary">{{review.room.name}}
+                </span>
+                <p class="card-text mt-1">{{review.contents}}
                 </p>
             </div>
             <div class="card-body">
                 <span class="float-right text-muted">
                     {% if review.user_id == user.id %}
-                    <a href="{% url 'edit' review.id %}" class="btn btn-info"><i
+                    <a href="{% url 'reviews:edit_review' %}" class="btn btn-info"><i
                             class="fas fa-trash-restore-alt"></i></a>
-                    <a href="{% url 'delete' review.id %}" class="btn btn-danger"><i class="fas fa-eraser"></i></a>
+                    <a href="{% url 'reviews:delete_review' %}" class="btn btn-danger"><i class="fas fa-eraser"></i></a>
                     {% else %}
                     created by {{review.user.username}}
                     {% endif %}
@@ -46,6 +71,92 @@
 <!-- 자바스크립트 -->
 {% block script %}
 <script>
-   
+    $(function () {
+        $(document).on('click', '.btn-company', function () {
+            $('.table-borderless').remove();
+            $('.btn-branch').text("BRANCH");
+            $('.btn-room').text("ROOM");
+            $.ajax({
+                url: '{% url "reviews:review_company" %}',
+                method: 'GET',
+                success: function (data) {
+                    $('.card-body-collapse').append(data);
+                },
+                error: function (data) {
+                    console.log("fail");
+                },
+            })
+        })
+        $(document).on('click', '.btn-company-name', function () {
+            $('.btn-company').text($(this).val());
+            $('.collapse').toggleClass("show");
+
+        })
+        $(document).on('click', '.btn-branch', function () {
+            $('.btn-room').text("ROOM");
+            $('.table-borderless').remove();
+            var company = $('.btn-company').text();
+            $.ajax({
+                url: '{% url "reviews:review_branch" %}',
+                method: 'GET',
+                data: {
+                    company_name: company,
+                },
+                success: function (data) {
+                    $('.card-body-collapse').append(data);
+                },
+                error: function (data) {
+                    console.log("fail");
+                },
+            })
+        })
+        $(document).on('click', '.btn-branch-name', function () {
+            $('.btn-branch').text($(this).val());
+            $('.collapse').toggleClass("show");
+
+        })
+        $(document).on('click', '.btn-room', function () {
+            $('.table-borderless').remove();
+            var company = $('.btn-company').text();
+            var branch = $('.btn-branch').text();
+            $.ajax({
+                url: '{% url "reviews:review_room" %}',
+                method: 'GET',
+                data: {
+                    company_name: company,
+                    branch_name: branch,
+                },
+                success: function (data) {
+                    $('.card-body-collapse').append(data);
+                },
+                error: function (data) {
+                    console.log("fail");
+                },
+            })
+        })
+        $(document).on('click', '.btn-room-name', function () {
+            $('.btn-room').text($(this).val());
+            selected_id = $(this).data("id");
+            $('.btn-room-name').data("selected-id", selected_id);
+            $('input[name=room_id]').val(selected_id);
+            $('.collapse').toggleClass("show");
+
+        })
+        $(document).on('submit', '.review-form', function (event) {
+            event.preventDefault();
+            var data = $(this).serialize();
+            $.ajax({
+                url: '{% url "reviews:reviews" %}',
+                method: 'POST',
+                data: data,
+                success: function (data) {
+                    console.log("success");
+                },
+                error: function (data) {
+                    console.log("fail");
+                },
+            })
+        })
+    })
 </script>
 {% endblock %}
