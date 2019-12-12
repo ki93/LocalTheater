@@ -276,7 +276,52 @@ def inputCrawlingDataToDB(CrawlingData,today,room_id,movie_id,room_temp,movie_te
 def adminpage(request):
     if request.user.is_staff:
         if request.method == "POST":
-                
+                theater, created = Theater.objects.update_or_create(
+                    company = request.POST.get("company"), 
+                    branch = request.POST.get("branch"),
+                    defaults={
+                        'company' : request.POST.get("company"),
+                        'branch' : request.POST.get("branch"), 
+                        'lat' : request.POST.get("lat"), 
+                        'lon' : request.POST.get("lon"),
+                        }
+                )
+
+                movie, created = Movie.objects.update_or_create(
+                    title = request.POST.get("title"), defaults={
+                        'title' : request.POST.get("title"),
+                    }
+                )
+                room, created = Room.objects.update_or_create(
+                    theater_id = theater.id,
+                    name = request.POST.get("name"),
+                    defaults={
+                        'theater_id' : theater.id,
+                        'name' : request.POST.get("name"),
+                        'category' : request.POST.get("category"),
+                    }
+                )
+                theatermovie, created = TheaterMovie.objects.update_or_create(
+                    theater_id = theater.id,
+                    movie_id = movie.id,
+                    defaults={
+                        'theater_id' : theater.id,
+                        'movie_id' : movie.id,
+                    }
+                )
+                start_time_date = request.POST.get("start_time_date")
+                start_time_time = request.POST.get("start_time_time")
+                start_time = " ".join([start_time_date,start_time_time])
+                timetable, created = Timetable.objects.update_or_create(
+                    start_time = start_time,
+                    room_id = room.id,
+                    defaults={
+                        'start_time' : start_time,
+                        'room_id' : room.id,
+                        'playInfo_id' : theatermovie.id,
+                    }
+                )
+
                 return redirect('board:adminpage')
         else:
             theaters = Theater.objects.all().order_by("-created_at")

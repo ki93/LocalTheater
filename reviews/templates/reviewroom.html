@@ -1,0 +1,20 @@
+<table class="table table-borderless">
+    <tbody class="tbody">
+        {% for room in rooms %}
+        {% if forloop.counter0|divisibleby:"5" %}
+        <tr class="row">
+            <th scope="row"><input type="button" class="btn btn-room-name" value="{{room.name}}" data-id="{{room.id}}"
+                    data-type="title">
+            </th>
+            {% else %}
+
+            <td><input type="button" class="btn btn-room-name" value="{{room.name}}" data-id="{{room.id}}" data-type="title">
+            </td>
+            {% endif %}
+            {% if forloop.counter|divisibleby:"5" %}
+        </tr>
+        {% endif %}
+        {% endfor %}
+        </tr>
+    </tbody>
+</table>
