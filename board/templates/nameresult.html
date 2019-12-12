@@ -22,10 +22,15 @@
                 <td rowspan="1">
                     <ul>
                         <li>
+                        <div class="card-columns">
                             {% for timetable in theatermovie.timetable_set.all %}
-                            {{timetable.room.name}}
-                            <span class="p-2">{{timetable.start_time|time:"H:i"}}</span>
+                            <div class="card bg-secondary" OnClick="location.href ='{{timetable.link}}'" style="cursor:pointer;" >
+                                {{timetable.room.name}}<br>
+                                {{timetable.start_time|time:"H:i"}} / {{timetable.remainSeat}}
+                            </div>
+                            
                             {% endfor %}
+                        </div>
                         </li>
                     </ul>
                 </td>

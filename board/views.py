@@ -8,6 +8,7 @@ from .LotteMovieInfoParsing import LOTTEMovieInfo
 from .MEGABOXMovieInfoParsing import MEGABOXMovieInfo
 from multiprocessing.pool import ThreadPool
 import simplejson as json
+from datetime import date, datetime,timedelta
 # DRF
 # Create your views here.
 
@@ -44,44 +45,20 @@ def viewMovieInfoByBranch(request):
 
 
 def selectBranch(request):
-    CGVNomal = request.session['CGVNomal']
-    lotteNomal = request.session['LotteNomal']
-    MEGABOXNomal = request.session['MEGABOXNomal']
     CGV_branchs = set()
-    for CGV in CGVNomal:
-        if CGV['branch'] not in CGV_branchs:
-            CGV_branchs.add(CGV['branch'])
-
     Lotte_branchs = set()
-    for Lotte in lotteNomal:
-        if Lotte['branch'] not in Lotte_branchs:
-            Lotte_branchs.add(Lotte['branch'])
-
     MEGABOX_branchs = set()
-    for MEGABOX in MEGABOXNomal:
-        if MEGABOX['branch'] not in MEGABOX_branchs:
-            MEGABOX_branchs.add(MEGABOX['branch'])
-
-    branchs_locations = {
-        'CGV_강남' : {
-            'name' : 'CGV_강남',
-            'lat': 37.501609,
-            'lon': 127.026368
-        },
-        'MEGABOX_강남' : {
-            'name' : 'MEGABOX_강남',
-            'lat' : 37.497893,
-            'lon' : 127.026456
-        },
-        'Lotte_강남' : {
-            'name' : 'Lotte_강남',
-            'lat' : 37.500345,
-            'lon' : 127.027017
-        }
-    }
+    
     Branchs = Theater.objects.all()
     Branch_location_info = []
     for branch in Branchs:
+        if branch.company == "CGV":
+            CGV_branchs.add(branch.branch)
+        elif branch.company == "MEGABOX":
+            MEGABOX_branchs.add(branch.branch)
+        elif branch.company == "Lotte":
+            Lotte_branchs.add(branch.branch)
+
         branch_info = {
             'company' : branch.company,
             'name' : branch.branch,
@@ -153,13 +130,13 @@ def index(request):
     CGVNormalInfo, CGVSpecialInfo, LotteNormalInfo, LotteSpecialInfo, MEGABOXNormalInfo, MEGABOXSpecialInfo = \
         searchByBranch(CGVInfo.CGV_branch, LotteInfo.Lotte_branch, MEGABOXInfo.MEGABOX_branch)
 
-    request.session['CGVNomal'] = CGVNormalInfo
-    request.session['CGVSpecial'] = CGVSpecialInfo
-    request.session['LotteNomal'] = LotteNormalInfo
-    request.session['LotteSpecial'] = LotteSpecialInfo
-    request.session['MEGABOXNomal'] = MEGABOXNormalInfo
-    request.session['MEGABOXSpecial'] = MEGABOXSpecialInfo
-
+    inputDatasToDB(CGVNormalInfo)
+    inputDatasToDB(CGVSpecialInfo)
+    inputDatasToDB(LotteNormalInfo)
+    inputDatasToDB(LotteSpecialInfo)
+    inputDatasToDB(MEGABOXNormalInfo)
+    inputDatasToDB(MEGABOXSpecialInfo)
+    
     return render(request, 'index.html')
 
 def findbylocate(request):
@@ -207,10 +184,7 @@ def findbyname(request):
         movie_title = Movie.objects.get(id=movie_id).title
         theaters = Theater.objects.filter(id__in=theater_id)
         theatermovies = TheaterMovie.objects.filter(movie_id__in=movie_id, theater_id__in=theater_id)
-        print(movie_id)
-        print(theaters)
-        print(movie_title) 
-        print(theatermovies)
+        print()
         context = {
             'theatermovies' : theatermovies,
         }
@@ -225,63 +199,94 @@ def findmoviename(request):
     }
     return render(request, 'findnamepage.html', context)
 
+def inputDatasToDB(datas):
+    today = date.today()
+    room_id = -1
+    movie_id = -1
+    room = ""
+    movie = ""
+    print(today)
+    for data in datas:
+        room_id,movie_id,room,movie = inputCrawlingDataToDB(data,today,room_id,movie_id,room,movie)
+
+def inputCrawlingDataToDB(CrawlingData,today,room_id,movie_id,room_temp,movie_temp):
+    # print(CrawlingData)
+    theater= Theater.objects.get(company=CrawlingData['company'],branch=CrawlingData['branch'])
+    if movie_temp ==CrawlingData['movie'] :
+        movie = movie_id
+    else:
+        movie, created = Movie.objects.update_or_create(
+            title = CrawlingData['movie'], 
+            defaults={
+                'title' : CrawlingData['movie']
+            }
+        )
+
+    if room_temp == CrawlingData['hall']:
+        room = room_id
+    else :
+        room, created = Room.objects.update_or_create(
+            theater_id = theater.id,
+            name = CrawlingData['hall'],
+            category = CrawlingData['special'],
+            defaults={
+                'theater_id' : theater.id,
+                'name' : CrawlingData['hall'],
+                'category' : CrawlingData['special'],
+            }
+        )
+    theatermovie, created = TheaterMovie.objects.update_or_create(
+        theater_id = theater.id,
+        movie_id = movie.id,
+        defaults={
+            'theater_id' : theater.id,
+            'movie_id' : movie.id,
+        }
+    )
+    d1 = today.strftime("%Y-%m-%d")
+
+    start_time = " ".join([d1,CrawlingData['time']])
+    
+    try:
+        date_time = datetime.strptime(start_time,'%Y-%m-%d %H:%M')
+    except:
+        d1 = (today + timedelta(hours=1)).strftime("%Y-%m-%d")
+        time = CrawlingData['time'].split(":")
+        hour = time[0]
+        minute = time[1]
+        time = str((int(hour)-24))+":"+minute
+        start_time = " ".join([d1,time])
+        date_time = datetime.strptime(start_time,'%Y-%m-%d %H:%M')
+
+    timetable, created = Timetable.objects.update_or_create(
+        start_time = date_time,
+        room_id = room.id,
+        link = CrawlingData['link'],
+        defaults={
+            'start_time' : date_time,
+            'room_id' : room.id,
+            'playInfo_id' : theatermovie.id,
+            'remainSeat' : CrawlingData['remainSeat'],
+            'link' : CrawlingData['link'],
+        }
+    )
+    return room,movie,CrawlingData['hall'],CrawlingData['movie']
+
+
 def adminpage(request):
     if request.user.is_staff:
         if request.method == "POST":
-                theater, created = Movie.objects.update_or_create(
-                    company = request.POST.get("company"), 
-                    branch = request.POST.get("branch"),
-                    defaults={
-                        'company' : request.POST.get("company"),
-                        'branch' : request.POST.get("branch"), 
-                        'lat' : request.POST.get("lat"), 
-                        'lon' : request.POST.get("lon"),
-                        }
-                )
-
-                movie, created = Movie.objects.update_or_create(
-                    title = request.POST.get("title"), defaults={
-                        'title' : request.POST.get("title"),
-                    }
-                )
-                room, created = Room.objects.update_or_create(
-                    theater_id = theater.id,
-                    name = request.POST.get("name"),
-                    defaults={
-                        'theater_id' : theater.id,
-                        'name' : request.POST.get("name"),
-                        'category' : request.POST.get("category"),
-                    }
-                )
-                theatermovie, created = TheaterMovie.objects.update_or_create(
-                    theater_id = theater.id,
-                    movie_id = movie.id,
-                    defaults={
-                        'theater_id' : theater.id,
-                        'movie_id' : movie.id,
-                    }
-                )
-                start_time_date = request.POST.get("start_time_date")
-                start_time_time = request.POST.get("start_time_time")
-                start_time = " ".join([start_time_date,start_time_time])
-                timetable, created = Timetable.objects.update_or_create(
-                    start_time = start_time,
-                    room_id = room.id,
-                    defaults={
-                        'start_time' : start_time,
-                        'room_id' : room.id,
-                        'playInfo_id' : theatermovie.id,
-                    }
-                )
+                
                 return redirect('board:adminpage')
         else:
             theaters = Theater.objects.all().order_by("-created_at")
-            for theater in theaters:
-                print(theater.get_all_movies)
-                print(theater.movies.all())
-                for movie in theater.movies.all():
-                    print(theater.movies.all())
-                    print(movie.title)
+            # for theater in theaters:
+            #     print(theater.get_all_movies)
+            #     print(theater.movies.all())
+                
+            #     for movie in theater.movies.all():
+            #         print(theater.movies.all())
+            #         print(movie.title)
             context = {
                 'theaters' : theaters,
             }
