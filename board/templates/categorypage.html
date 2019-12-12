@@ -13,10 +13,10 @@
             {% for theater in theaters %}
             {% if forloop.counter0|divisibleby:"5" %}
             <tr class="row">
-            <th scope="row"><input type="button" class="btn btn-branch-name" value="{{theater.branch}} " data-id="{{theater.id}}">
+            <th scope="row"><input type="button" class="btn btn-branch-name" value="{{theater.company}}_{{theater.branch}} " data-id="{{theater.id}}">
                     </th>
             {% else %}
-            <td><input type="button" class="btn btn-branch-name" value="{{theater.branch}}" data-id="{{theater.id}}"></td>
+            <td><input type="button" class="btn btn-branch-name" value="{{theater.company}}_{{theater.branch}}" data-id="{{theater.id}}"></td>
             {% endif %}
             {% if forloop.counter|divisibleby:"5" %}
             </tr>

@@ -127,15 +127,15 @@ def index(request):
     LotteInfo = LOTTEMovieInfo()
     MEGABOXInfo = MEGABOXMovieInfo()
 
-    CGVNormalInfo, CGVSpecialInfo, LotteNormalInfo, LotteSpecialInfo, MEGABOXNormalInfo, MEGABOXSpecialInfo = \
-        searchByBranch(CGVInfo.CGV_branch, LotteInfo.Lotte_branch, MEGABOXInfo.MEGABOX_branch)
+    # CGVNormalInfo, CGVSpecialInfo, LotteNormalInfo, LotteSpecialInfo, MEGABOXNormalInfo, MEGABOXSpecialInfo = \
+    #     searchByBranch(CGVInfo.CGV_branch, LotteInfo.Lotte_branch, MEGABOXInfo.MEGABOX_branch)
 
-    inputDatasToDB(CGVNormalInfo)
-    inputDatasToDB(CGVSpecialInfo)
-    inputDatasToDB(LotteNormalInfo)
-    inputDatasToDB(LotteSpecialInfo)
-    inputDatasToDB(MEGABOXNormalInfo)
-    inputDatasToDB(MEGABOXSpecialInfo)
+    # inputDatasToDB(CGVNormalInfo)
+    # inputDatasToDB(CGVSpecialInfo)
+    # inputDatasToDB(LotteNormalInfo)
+    # inputDatasToDB(LotteSpecialInfo)
+    # inputDatasToDB(MEGABOXNormalInfo)
+    # inputDatasToDB(MEGABOXSpecialInfo)
     
     return render(request, 'index.html')
 
@@ -181,10 +181,7 @@ def findbyname(request):
         id_string = request.GET.get('selected')
         movie_id = id_string.split('-')[0]
         theater_id = list(map(int,id_string.split('-')[1:-1]))
-        movie_title = Movie.objects.get(id=movie_id).title
-        theaters = Theater.objects.filter(id__in=theater_id)
-        theatermovies = TheaterMovie.objects.filter(movie_id__in=movie_id, theater_id__in=theater_id)
-        print()
+        theatermovies = TheaterMovie.objects.filter(movie_id=movie_id, theater_id__in=theater_id)
         context = {
             'theatermovies' : theatermovies,
         }
