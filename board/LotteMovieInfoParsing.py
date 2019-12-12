@@ -9,7 +9,7 @@ class LOTTEMovieInfo:
         time = datetime.datetime.now()
         CineCode = "1004"
         urls = "http://www.lottecinema.co.kr/LCWS/Ticketing/TicketingData.aspx?nocashe=0.10753130276220801"
-        company = "LotteCinema"
+        company = "Lotte"
 
         Bookingurl = "http://www.lottecinema.co.kr/LCHS/Contents/Cinema/Cinema-Detail.aspx?divisionCode=1&detailDivisionCode=1&cinemaID="
         
@@ -83,7 +83,7 @@ class LOTTEMovieInfo:
             }
         })
         urls = "http://www.lottecinema.co.kr/LCWS/Ticketing/TicketingData.aspx?nocashe=0.10753130276220801"
-        company = "LotteCinema"
+        company = "Lotte"
 
         for Lotte_branch in LOTTE_Special:
             Bookingurl = "http://www.lottecinema.co.kr/LCHS/Contents/Cinema/Cinema-Detail.aspx?divisionCode=2&detailDivisionCode=" + \
