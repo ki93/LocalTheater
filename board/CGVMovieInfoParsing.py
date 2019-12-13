@@ -44,7 +44,7 @@ class CGVMovieInfo :
                         'special' : screenType,
                         "time": showResult.find('em').getText().strip(),
                         "link": mainUrl + showResult['href'],
-                        "remainSeat": showResult.find('span',class_='txt-lightblue').getText().strip()[4:] + "/" + halInfo[2].getText().strip()[3:].strip()
+                        "remainSeat": showResult.find('span',class_='txt-lightblue').getText().strip()[4:] + "/" + hall_info[2].getText().strip()[3:].strip()
                     }
                     if screenType == '일반':
                         totalInfo.append(data)

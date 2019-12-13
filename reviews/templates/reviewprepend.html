@@ -1,0 +1,22 @@
+<div class="row mt-4 review-{{review.id}}">
+    <div class="card col-12">
+        <div class="card-body">
+            <span class="card-text text-primary">{{review.room.theater.company}}
+            </span><span class="card-text text-primary">{{review.room.theater.branch}}
+            </span>
+            <span class="card-text text-primary">{{review.room.name}}
+            </span>
+            <p class="card-text mt-1">{{review.contents}}
+            </p>
+        </div>
+        <div class="card-body">
+            <span class="float-right text-muted">
+                {% if review.user_id == user.id %}
+                <button href="" class="btn btn-danger" data-review-delete-id="{{review.id}}"><i class="fas fa-eraser"></i></button>
+                {% else %}
+                created by {{review.user.username}}
+                {% endif %}
+            </span>
+        </div>
+    </div>
+</div>

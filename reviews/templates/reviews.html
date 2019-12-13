@@ -38,9 +38,9 @@
         </form>
     </div>
 </div>
-<div class="container">
+<div class="container container-review-list">
     {% for review in reviews %}
-    <div class="row mt-4">
+    <div class="row mt-4 review-{{review.id}}">
         <div class="card col-12">
             <div class="card-body">
                 <span class="card-text text-primary">{{review.room.theater.company}}
@@ -54,9 +54,7 @@
             <div class="card-body">
                 <span class="float-right text-muted">
                     {% if review.user_id == user.id %}
-                    <a href="{% url 'reviews:edit_review' %}" class="btn btn-info"><i
-                            class="fas fa-trash-restore-alt"></i></a>
-                    <a href="{% url 'reviews:delete_review' %}" class="btn btn-danger"><i class="fas fa-eraser"></i></a>
+                    <button class="btn btn-danger" data-review-delete-id="{{review.id}}"><i class="fas fa-eraser"></i></button>
                     {% else %}
                     created by {{review.user.username}}
                     {% endif %}
@@ -150,12 +148,35 @@
                 method: 'POST',
                 data: data,
                 success: function (data) {
+                    console.log(data);
+                    $('.container-review-list').prepend(data);
                     console.log("success");
                 },
                 error: function (data) {
                     console.log("fail");
                 },
             })
+        })
+        $(document).on('click', '.btn-danger', function () {
+            var review_id = $(this).data("review-delete-id");
+            console.log(review_id);
+            $.ajax({
+                url: '{% url "reviews:delete_review" %}',
+                method: 'POST',
+                data: {
+                    review_id: review_id,
+                    csrfmiddlewaretoken: '{{csrf_token}}', 
+                },
+                success: function (data) {
+                    $('.review-'+data).remove();
+                    console.log(data);
+                   
+                },
+                error: function (data) {
+                    console.log("fail");
+                },
+            })
+
         })
     })
 </script>

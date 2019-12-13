@@ -28,6 +28,7 @@ def signout(request):
 def signup(request):
     if request.method == "POST":
         form = CreateUserForm(request.POST)
+        print(form.is_valid())
         if form.is_valid():
             user = form.save()
             auth_signin(request, user)

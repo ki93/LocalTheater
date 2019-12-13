@@ -14,7 +14,10 @@ def reviews(request):
             review.contents = request.POST.get("contents")
             review.user_id = request.user.id
             review.save()
-            return redirect('reviews:reviews')
+            context = {
+                'review' : review,
+            }
+            return render(request, 'reviewprepend.html', context)
         else:
             return redirect('accounts:signin')
     else:
@@ -24,28 +27,15 @@ def reviews(request):
         }
         return render(request, 'reviews.html', context)
 
-def edit_review(request, article_id):
-    article = Article.objects.get(id=article_id)
-    if article.is_permitted(request.user.id):
-        if request.method == "POST":
-            article.contents = request.POST["contents"]
-            article.save()
-            return redirect('insta')
-        else:
-            context = {
-                'article' : article
-            }
-            return render(request, 'article/edit.html', context)
+def delete_review(request):
+    review_id = request.POST.get("review_id")
+    review = Review.objects.get(id=review_id)
+    print(review_id)
+    if review.user_id == request.user.id:
+        review.delete()
+        return HttpResponse(review_id)
     else:
-        return redirect('insta')
-
-def delete_review(request, article_id):
-    article = Article.objects.get(id=article_id)
-    if article.is_permitted(request.user.id):
-        article.delete()
-        return redirect('insta')
-    else:
-        return redirect('insta')
+        return redirect('reviews:reviews')
 
 def review_company(request):
     return render(request, 'reviewcompany.html')
@@ -67,5 +57,4 @@ def review_room(request):
         'rooms' : rooms,
     }
     return render(request, 'reviewroom.html', context)
-
 
