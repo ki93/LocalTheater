@@ -46,6 +46,7 @@ class CGVMovieInfo :
                         "link": mainUrl + showResult['href'],
                         "remainSeat": showResult.find('span',class_='txt-lightblue').getText().strip()[4:] + "/" + hall_info[2].getText().strip()[3:].strip()
                     }
+                    print(data)
                     if screenType == '일반':
                         totalInfo.append(data)
                     else :
